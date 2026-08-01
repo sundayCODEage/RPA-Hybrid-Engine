@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>03 Frame Child</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+<body style="background: #f8fafc; padding: 10px; margin: 0;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" id="btnFrameAction" onclick="executeFrameAction()" style="padding: 6px 12px; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+            フレーム内処理実行
+        </button>
+        <span id="frameResult" style="font-weight: bold; color: #0369a1;"></span>
+    </div>
+
+    <script>
+        function executeFrameAction() {
+            document.getElementById('frameResult').innerText = '✅ 【成功】フレーム内クリックを検知しました！';
+        }
+    </script>
+</body>
+</html>

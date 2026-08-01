@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- 
+        ==================================================================
+        【第2章-3】07_pdf_embed.html
+        [RPAテスト目的] type属性なし ＆ 相対パスsrc の <embed> からのPDF直接取得
+        - ページタイトル: "[IP300100] 歳出整理簿 帳票プレビュー"
+        ==================================================================
+    -->
+    <meta charset="UTF-8">
+    <title>[IP300100] 歳出整理簿 帳票プレビュー</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+<body id="pdfbodyarea">
+    <div class="sys-header">
+        <h2>[IP300100] 歳出整理簿 帳票プレビュー</h2>
+        <span>発行日: 2026年07月26日</span>
+    </div>
+
+    <!-- RPA自動化の目的とテスト仕様の案内カード -->
+    <div class="card" style="margin-top:15px; background:#f8fafc; border-left:4px solid #0284c7;">
+        <h3 style="color:#0369a1; margin-top:0;">💡 RPA自動化のテスト仕様と動作フロー</h3>
+        <p style="font-size:0.85rem; color:#334155; line-height:1.6; margin-bottom:5px;">
+            1. 画面上のPDFプレビュー枠（<code>&lt;embed&gt;</code>）から、JavaScript経由でPDFの絶対URLを自動解析します。<br>
+            2. EdgeネイティブPDFビューアのUI操作を行わず、<strong>Fetch APIを用いてセッションを保持したまま直接サイレント保存</strong>を行います。<br>
+            ※ 実際のWeb業務システム（<code>http://</code> / <code>https://</code>）環境にて、画面操作なしでの高速・確実なPDFファイル保存を実証します。
+        </p>
+    </div>
+
+    <div class="card" style="margin-top:15px;">
+        <h3>■ プレビュー表示エリア</h3>
+        <p style="font-size:0.85rem; color:#666; margin-bottom:10px;">
+            ※ <code>type="application/pdf"</code> 属性が存在せず、<code>src</code> が相対パスのレガシーHTML構造を想定したテストです。
+        </p>
+
+        <div id="pdfarea" class="pdfareastyle" style="border:1px solid #cbd5e1; border-radius:4px; overflow:hidden;">
+            <embed class="pdfareastyle" src="sample_report.pdf" width="100%" height="450px" type="application/pdf">
+        </div>
+    </div>
+</body>
+</html>

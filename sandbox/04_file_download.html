@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>04. ファイルダウンロードテスト画面</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+<body>
+    <h2>■ 第1章-4：サイレント・ファイルダウンロード</h2>
+    <p>OSのダイアログを抑止し、指定パスへファイルを自動保存するテストです。</p>
+
+    <div class="card">
+        <h3>■ ダウンロード対象データプレビュー (職員情報CSV)</h3>
+
+        <!-- 
+            ==================================================================
+            [RPAテスト目的] サイレントダウンロードの動作検証
+            - 事前準備: Enable-SilentDownload で保存先フォルダとファイル名を指定
+            - 操作: Invoke-WebXPathClick でリンク/ボタンをクリック
+            - 待機: Wait-FileDownload で指定ファイルの着弾・ロック解除を待機
+            ==================================================================
+        -->
+
+        <!-- 画面上でのサンプルデータ表示 -->
+        <table border="1" style="width:100%; border-collapse:collapse; text-align:center; margin-top:10px; margin-bottom:15px; font-size:0.9rem;">
+            <thead>
+                <tr style="background:#f1f5f9;">
+                    <th>職員ID</th>
+                    <th>氏名</th>
+                    <th>所属部署</th>
+                    <th>ステータス</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1001</td><td>会社 太郎</td><td>総務課</td><td>有効</td></tr>
+                <tr><td>1002</td><td>海外 花子</td><td>財政課</td><td>有効</td></tr>
+                <tr><td>1003</td><td>試験 二郎</td><td>市民課</td><td>保留</td></tr>
+            </tbody>
+        </table>
+
+        <!-- 3件データを含むCSVを生成するダウンロードボタン -->
+        <a id="dlLink" href="#" onclick="downloadCsv()" style="display:inline-block; padding:10px 20px; background:#2563eb; color:#fff; text-decoration:none; border-radius:4px; font-weight:bold;">
+            📥 職員データ(CSV)をダウンロード
+        </a>
+    </div>
+
+    <script>
+        function downloadCsv() {
+            // BOM付きUTF-8で3件の職員データを生成
+            const csvContent = "\uFEFF職員ID,氏名,所属部署,ステータス\n1001,会社 太郎,総務課,有効\n1002,海外 花子,財政課,有効\n1003,試験 二郎,市民課,保留";
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.getElementById('dlLink');
+            a.href = url;
+            a.download = 'Ch1_DownloadTest.csv';
+        }
+    </script>
+</body>
+</html>

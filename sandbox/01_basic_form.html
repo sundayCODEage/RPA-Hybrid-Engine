@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- 
+        ==================================================================
+        [RPAテスト目的] ページのタイトル取得テスト
+        - VBA実行コマンド: rpaEngine.RunAction "Get-WebTitle"
+        ==================================================================
+    -->
+    <meta charset="UTF-8">
+    <title>01. 標準フォーム操作テスト画面</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+
+<!-- RPA自動化の目的とテスト仕様の案内カード -->
+    <div class="card" style="margin-top:15px; background:#f8fafc; border-left:4px solid #0284c7; margin-bottom:15px;">
+        <h3 style="color:#0369a1; margin-top:0; margin-bottom:10px;">💡 【RPAテスト検証】 3パターンの反復操作テスト</h3>
+        <p style="font-size:0.88rem; color:#334155; line-height:1.6; margin:0;">
+            この画面では、全く同じフォーム要素に対して異なる3つのアプローチで自動操作の反復テストを行います。<br>
+            <strong>① XPath指定</strong> ➔ <strong>② CSSセレクタ指定</strong> ➔ <strong>③ CDPネイティブ操作</strong><br><br>
+            ⏳ <strong>【ご案内】</strong> 目視で動作を確認できるよう、意図的に各操作の間に待機時間（ウェイト）を設けているため、テスト完了まで少し時間がかかります。<br>
+            👉 <strong>【確認事項】</strong> 実行中はVBAのイミディエイトウィンドウ（またはコンソール出力）を開き、<strong>XPath、CSS、CDP</strong>それぞれの通信ログと実行結果を見比べながら動作の推移をご確認ください。
+        </p>
+        <br>
+    </div>
+
+<body>
+    <h2>■ 第1章-1：標準Webフォーム操作</h2>
+    <p>入力欄、ドロップダウン、チェックボックス、ボタンクリックの基本テスト画面です。</p>
+
+    <div class="card">
+        <form id="basicForm" onsubmit="return false;">
+            <!-- テキスト入力 -->
+            <div class="form-group">
+                <label for="txtInput">ユーザー名:</label>
+                <!-- 
+                    ==================================================================
+                    [RPAテスト目的] テキスト入力
+                    - VBA: rpaEngine.RunAction "Set-WebXPathTextInput", CreateParams("XPath", "//input[@id='txtInput']", "Value", "テスト太郎")
+                    ==================================================================
+                -->
+                <input type="text" id="txtInput" name="username" placeholder="名前を入力してください">
+            </div>
+
+            <!-- ドロップダウン選択 -->
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="selDept">所属部署:</label>
+                <!-- 
+                    ==================================================================
+                    [RPAテスト目的] ドロップダウン要素のクリック・選択
+                    - VBA: rpaEngine.RunAction "Invoke-WebXPathClick", CreateParams("XPath", "//select[@id='selDept']/option[@value='D02']")
+                   ==================================================================
+                -->
+                <select id="selDept">
+                    <option value="">-- 選択してください --</option>
+                    <option value="D01">総務課</option>
+                    <option value="D02">財政課</option>
+                    <option value="D03">市民課</option>
+                </select>
+            </div>
+
+            <!-- チェックボックス -->
+            <div class="form-group" style="margin-top: 10px;">
+                <!-- 
+                    ==================================================================
+                    [RPAテスト目的] チェックボックスのトグル（ON/OFF）
+                    - VBA: rpaEngine.RunAction "Invoke-WebXPathClick", CreateParams("XPath", "//input[@id='chkAgree']")
+                   ==================================================================
+                -->
+                <label>
+                    <input type="checkbox" id="chkAgree"> 利用規約に同意する
+                </label>
+            </div>
+
+            <button type="button" id="btnApply" style="margin-top: 15px;" onclick="applyForm()">フォーム内容を反映</button>
+        </form>
+
+        <div style="margin-top: 15px; padding: 10px; background: #e2e8f0; border-radius: 4px;">
+            <span>現在の反映内容：</span>
+            <!-- 
+                ==================================================================
+                [RPAテスト目的] テキスト読み取り (Get-WebXPathText)
+                - VBA: rpaEngine.RunAction("Get-WebXPathText", CreateParams("XPath", "//span[@id='lblDisplay']"))
+               ==================================================================
+            -->
+            <span id="lblDisplay" style="font-weight: bold; color: #1e3a8a;">（未反映）</span>
+        </div>
+    </div>
+
+    <script>
+        function applyForm() {
+            const name = document.getElementById('txtInput').value;
+            const deptSelect = document.getElementById('selDept');
+            const deptText = deptSelect.options[deptSelect.selectedIndex].text;
+            const agree = document.getElementById('chkAgree').checked ? "同意あり" : "同意なし";
+
+            document.getElementById('lblDisplay').innerText = `${name} / ${deptText} / ${agree}`;
+        }
+    </script>
+</body>
+</html>

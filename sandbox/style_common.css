@@ -1,0 +1,114 @@
+@charset "UTF-8";
+
+/* --- 全体基本スタイル --- */
+body {
+    font-family: "Meiryo", "メイリオ", sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f2f5;
+    color: #333;
+}
+
+/* --- ヘッダー・システムタイトル --- */
+.sys-header {
+    background-color: #1a365d;
+    color: #ffffff;
+    padding: 10px 20px;
+    margin: -20px -20px 20px -20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- オペレーションマスク（業務システム特有の処理中遮断画面） --- */
+#opmask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#opmask.hidden {
+    display: none !important;
+}
+.spinner-text {
+    background: #ffffff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* --- ファンクションキー風ボタンバー --- */
+.function-bar {
+    display: flex;
+    gap: 8px;
+    background: #e2e8f0;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+.function-bar li {
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    user-select: none;
+}
+.function-bar li:hover {
+    background: #cbd5e1;
+}
+
+/* --- データ表示テーブル (#IP100710G-variable-body-table) --- */
+.data-table-container {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+table.grid-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+table.grid-table th, table.grid-table td {
+    border: 1px solid #cbd5e1;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.85rem;
+}
+table.grid-table th {
+    background-color: #f1f5f9;
+}
+
+/* --- モーダルダイアログ --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9000;
+}
+.modal-overlay.hidden {
+    display: none;
+}
+.modal-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    text-align: center;
+}

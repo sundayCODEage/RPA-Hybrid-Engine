@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- 
+        ==================================================================
+        【第2章-1】05_business_batch.html
+        [RPAテスト目的] 業務システム特有の画面遮断マスク ＆ 疑似Ajaxバッチ監視
+        - ページタイトル取得: Get-WebTitle
+        - 期待値: "[IP325210S] 歳出整理簿バッチ"
+        ==================================================================
+    -->
+    <meta charset="UTF-8">
+    <title>[IP325210S] 歳出整理簿バッチ</title>
+    <link rel="stylesheet" href="style_common.css">
+    <style>
+        /* 操作不可オーバーレイ（マスク）用スタイル */
+        #opmask {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #opmask.hidden { display: none !important; }
+        .mask-box {
+            background: #ffffff; padding: 20px 40px; border-radius: 8px;
+            font-weight: bold; font-size: 1.1rem; color: #1e3a8a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* 処理状態一覧テーブル用の文字サイズ・余白調整 (一回り小さく高密度化) */
+        .batch-grid {
+            font-size: 0.8rem !important; /* 文字サイズを一回り小さく設定 */
+        }
+        .batch-grid th, .batch-grid td {
+            padding: 5px 4px !important; /* 行間・余白をすっきり縮小 */
+            vertical-align: middle;
+        }
+        .batch-grid th {
+            background-color: #f1f5f9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 
+        ==================================================================
+        [RPAテスト目的①] オペレーションマスク (画面操作の遮断) の解除待機
+        - 業務システムで処理実行中に画面全体を覆うグレーアウト（#opmask）です。
+        - VBA実行コマンド:
+          rpaEngine.RunAction "Wait-WebXPathElementDisappear", CreateParams("XPath", "//*[@id='opmask']", "TimeoutSec", 10)
+        - これを挟むことで「画面は見えているが操作を受け付けない」状態での連打エラーを防ぎます。
+        ==================================================================
+    -->
+    <div id="opmask" class="hidden">
+        <div class="mask-box">⌛ 処理中... しばらくお待ちください</div>
+    </div>
+
+    <div class="sys-header">
+        <h2>[IP325210S] 歳出整理簿バッチ</h2>
+        <span>ログイン者: 財政課 担当者A</span>
+    </div>
+
+    <!-- ファンクションキー風ボタンバー -->
+    <ul class="function-bar" style="display:flex; gap:10px; background:#e2e8f0; padding:10px; list-style:none; margin-bottom:15px;">
+        <li id="FUNC4" onclick="triggerSearch()" style="background:#fff; padding:8px 15px; border:1px solid #ccc; cursor:pointer; font-weight:bold;">F4: 検索</li>
+        <li id="FUNC8" onclick="showStatus()" style="background:#fff; padding:8px 15px; border:1px solid #ccc; cursor:pointer; font-weight:bold;">F8: 状態表示</li>
+        <li id="FUNC11" onclick="startBatch()" style="background:#fff; padding:8px 15px; border:1px solid #ccc; cursor:pointer; font-weight:bold;">F11: バッチ起動</li>
+    </ul>
+
+    <!-- RPA自動化の目的とテスト仕様の案内カード -->
+    <div class="card" style="background:#f8fafc; border-left:4px solid #0284c7; margin-bottom:15px;">
+        <h3 style="color:#0369a1; margin-top:0;">💡 RPA自動化のテスト仕様と動作フロー</h3>
+        <p style="font-size:0.85rem; color:#334155; line-height:1.6; margin-bottom:5px;">
+            1. <strong>F11:バッチ起動</strong> を押すと、最新の処理番号「<code>100011</code>」が自動発行されます。<br>
+            2. 人間が手動操作する場合はF4キーを連達しますが、<strong>RPA上は定期的にF4検索を実行（ポーリング制御）</strong> して最新行の状態変化を監視します。<br>
+            3. 処理番号「<code>100011</code>」のステータスが「<strong>処理中</strong>」から「<strong>正常終了</strong>」に変わると自動ループ待機を完了します。
+        </p>
+        <br>
+    </div>
+
+    <div class="card">
+        <div class="form-group">
+            <label for="selectedLabel_IP325210SC~nenNendo_08">対象年度：</label>
+            <input type="text" id="selectedLabel_IP325210SC~nenNendo_08" value="令和08年度">
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:15px;">
+        <h3 style="margin-bottom:10px;">■ 処理状態一覧テーブル</h3>
+        <!-- 
+            ==================================================================
+            [RPAテスト目的②] ポーリング監視と動的データ変化の読み取り (3件データ)
+            - 対象セレクタ: "#IP100710G-variable-body-table"
+            - 自動採番のため上ほど最新: 100011 (最上段) > 100008 > 100005
+            - 1回目のF4検索時: 最上段(100011)が「処理中」/ 帳票「×」
+            - 2回目のF4検索時: 最上段(100011)が「正常終了」/ 帳票「○」
+            - VBA側で Do Until ロジックを組み、最上段が「正常終了」になるまでループ監視します。
+            ==================================================================
+        -->
+        <table id="IP100710G-variable-body-table" class="batch-grid" border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+            <thead>
+                <tr>
+                    <th style="width:7%;">選択</th>
+                    <th style="width:12%;">状態</th>
+                    <th style="width:25%;">業務名称</th>
+                    <th style="width:12%;">起動者</th>
+                    <th style="width:12%;">開始時間</th>
+                    <th style="width:12%;">終了時間</th>
+                    <th style="width:8%;">帳票</th>
+                    <th style="width:12%;">処理番号</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- 初期状態：未検索時は案内メッセージを表示 -->
+                <tr>
+                    <td colspan="8" style="color:gray; padding:15px;">F4ボタンを押して検索を実行してください</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let searchCount = 0;
+
+        // マスク表示のユーティリティ (指定ミリ秒間 #opmask を表示)
+        function showMask(ms, callback) {
+            const mask = document.getElementById('opmask');
+            mask.classList.remove('hidden');
+            setTimeout(() => {
+                mask.classList.add('hidden');
+                if (callback) callback();
+            }, ms);
+        }
+
+        // F4: 検索処理 (疑似Ajax)
+        function triggerSearch() {
+            // 800ms の操作不可マスクを表示して画面更新を再現
+            showMask(800, () => {
+                searchCount++;
+                const tbody = document.getElementById('tableBody');
+                
+                if (searchCount === 1) {
+                    // 1回目：最新処理(100011)がまだ「処理中」の状態
+                    tbody.innerHTML = `
+                        <tr>
+                            <td><button id="IP100710GC~d00@0">選択</button></td>
+                            <td style="color:#d97706; font-weight:bold;">処理中</td>
+                            <td>歳出整理簿バッチ</td>
+                            <td>財政　太郎</td>
+                            <td>10:05:00</td>
+                            <td>-</td>
+                            <td>×</td>
+                            <td><strong>100011</strong></td>
+                        </tr>
+                        <tr>
+                            <td><button id="IP100710GC~d00@1">選択</button></td>
+                            <td style="color:#166534;">正常終了</td>
+                            <td>歳出整理簿バッチ</td>
+                            <td>財政　太郎</td>
+                            <td>09:30:00</td>
+                            <td>09:32:15</td>
+                            <td>○</td>
+                            <td>100008</td>
+                        </tr>
+                        <tr>
+                            <td><button id="IP100710GC~d00@2">選択</button></td>
+                            <td style="color:#166534;">正常終了</td>
+                            <td>歳出整理簿バッチ</td>
+                            <td>財政　太郎</td>
+                            <td>09:00:00</td>
+                            <td>09:01:10</td>
+                            <td>○</td>
+                            <td>100005</td>
+                        </tr>
+                    `;
+                } else {
+                    // 2回目以降：バッチが完了し最新処理(100011)が「正常終了」へ変化
+                    tbody.innerHTML = `
+                        <tr>
+                            <td><button id="IP100710GC~d00@0">選択</button></td>
+                            <td style="color:#166534; font-weight:bold;">正常終了</td>
+                            <td>歳出整理簿バッチ</td>
+                            <td>財政課</td>
+                            <td>10:05:00</td>
+                            <td>10:06:23</td>
+                            <td>○</td>
+                            <td><strong>100011</strong></td>
+                        </tr>
+                        <tr>
+                            <td><button id="IP100710GC~d00@1">選択</button></td>
+                            <td style="color:#166534;">正常終了</td>
+                            <td>歳入決算バッチ</td>
+                            <td>財政課</td>
+                            <td>09:30:00</td>
+                            <td>09:32:15</td>
+                            <td>○</td>
+                            <td>100008</td>
+                        </tr>
+                        <tr>
+                            <td><button id="IP100710GC~d00@2">選択</button></td>
+                            <td style="color:#166534;">正常終了</td>
+                            <td>住民基本台帳連携</td>
+                            <td>市民課</td>
+                            <td>09:00:00</td>
+                            <td>09:01:10</td>
+                            <td>○</td>
+                            <td>100005</td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+
+        // F11: バッチ起動
+        function startBatch() {
+            showMask(1000, () => {
+                searchCount = 0; // カウンターリセット
+                alert("【システム通知】バッチ処理（受付番号: 100011）を正常に起動しました。\n※ RPAは自動的にF4検索（ポーリング）を実行して処理完了を検知します。");
+            });
+        }
+
+        // F8: 状態表示
+        function showStatus() {
+            showMask(300, () => {
+                console.log("ステータス照会完了");
+            });
+        }
+    </script>
+</body>
+</html>

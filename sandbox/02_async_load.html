@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>02. 非同期待機テスト画面</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+<body>
+    <h2>■ 第1章-2：要素の出現待機 ＆ ロード方式比較テスト</h2>
+
+    <!-- 1. テスト手順と補足説明エリア (確認1対応) -->
+    <div class="card" style="background:#f8fafc; border-left:4px solid #0284c7; margin-bottom:20px;">
+        <h3 style="color:#0369a1; margin-top:0;">💡 テスト実行の流れと検証内容</h3>
+        <ol style="font-size:0.88rem; color:#334155; line-height:1.7; padding-left:20px; margin-bottom:5px;">
+            <li><strong>【フェーズ1：ロード速度検証】</strong> ページ遷移直後に <code>Wait-WebDocumentReady</code>（DOM解析完了）と <code>Wait-WebPageLoad</code>（全リソース完了）の待機速度差をミリ秒単位で比較測定します。</li>
+            <li><strong>【フェーズ2：非同期待機検証】</strong> 下の「3秒かかる重い処理を実行」ボタンが押された後、ローディング表示（<code>#loadingSpinner</code>）の<strong>消滅待機</strong>と、結果要素（<code>#asyncResult</code>）の<strong>出現待機</strong>を行います。</li>
+        </ol>
+        <p style="font-size:0.88rem; color:#64748b; margin-top:5px; margin-bottom:0;">
+            ※ 初期表示時にロード速度検証を行うため、ボタンが押されるまで数秒間の待機ログが出力されます。
+        </p>
+        <br>
+    </div>
+
+    <!-- 2. 非同期処理実行カード -->
+    <div class="card">
+        <h3>■ 非同期コンテンツ処理</h3>
+        <p style="font-size:0.9rem; color:#475569; margin-bottom:15px;">
+            処理ボタンを押すとローディング表示が出現し、3秒後に自動的に消滅して結果要素が出現します。
+        </p>
+
+        <button type="button" id="btnStartAsync" onclick="startAsyncProcess()" style="padding:10px 20px; background:#0284c7; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
+            3秒かかる重い処理を実行
+        </button>
+
+        <!-- 処理中に表示され、完了時に消えるスピナー -->
+        <div id="loadingSpinner" style="display:none; margin-top:15px; color:#d97706; font-weight:bold;">
+            ⌛ サーバー通信中（3秒待ち）...
+        </div>
+
+        <!-- 3秒後に動的挿入される結果要素 -->
+        <div id="asyncContainer" style="margin-top:15px;"></div>
+    </div>
+
+    <!-- 3. 外部通信を行わない完全ローカルSVGダミー画像 (確認2対応: ネット接続不要) -->
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f1f5f9'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='24' fill='%2394a3b8'>Local Dummy Image</text></svg>" style="display:none;">
+
+    <script>
+        function startAsyncProcess() {
+            const spinner = document.getElementById('loadingSpinner');
+            const container = document.getElementById('asyncContainer');
+
+            spinner.style.display = 'block';
+            container.innerHTML = '';
+
+            setTimeout(() => {
+                spinner.style.display = 'none';
+                container.innerHTML = '<div id="asyncResult" style="padding:10px; background:#dcfce7; color:#166534; font-weight:bold; border-radius:4px;">✅ 【成功】非同期処理が完了し、要素が出現しました！</div>';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

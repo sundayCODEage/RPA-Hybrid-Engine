@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- 
+        ==================================================================
+        【第2章-4】08_robust_dom.html
+        [Robust DOM テスト目的] 隠し要素の誤検出回避・可視性判定・最適CSSセレクタ逆生成
+        ==================================================================
+    -->
+    <meta charset="UTF-8">
+    <title>[Robust DOM] 曖昧要素・レスポンシブ検証画面</title>
+    <link rel="stylesheet" href="style_common.css">
+    <style>
+        .hidden-mobile-menu { display: none !important; }
+        .hidden-footer-area { visibility: hidden !important; opacity: 0 !important; }
+        
+        /* white-space: pre-wrap; を追加してHTML内の改行を保持 */
+        .code-preview { 
+            background: #1e293b; 
+            color: #f8fafc; 
+            padding: 12px; 
+            border-radius: 6px; 
+            font-family: Consolas, Monaco, monospace; 
+            font-size: 0.82rem; 
+            overflow-x: auto; 
+            line-height: 1.6;
+            white-space: pre-wrap; 
+            word-break: break-all;
+        }
+        .highlight-green { color: #4ade80; font-weight: bold; }
+        .highlight-red { color: #f87171; }
+    </style>
+</head>
+<body>
+    <div class="sys-header">
+        <h2>[Robust DOM] 曖昧要素・可視性判定テスト</h2>
+        <span>ログイン者: 開発テスト担当者</span>
+    </div>
+
+    <!-- 画面上でDOM構造の仕組みを掴むためのソースコード表示エリア -->
+    <div class="card" style="margin-top:15px; background:#f8fafc; border-left:4px solid #6366f1;">
+        <h3 style="color:#4338ca; margin-top:0;">📄 解析対象のHTMLソースコード構造 (内部イメージ)</h3>
+        <p style="font-size:0.85rem; color:#475569; margin-bottom:8px;">
+            同名の「ニュース」「検索」要素が3箇所に存在します。Robust DOMエンジンは不可視要素を自動排除し、<span class="highlight-green">【可視】</span>な要素だけを狙撃します。
+        </p>
+        
+        <!-- 改行を保持する pre タグで囲み -->
+        <pre class="code-preview">&lt;!-- 1. スマホ用メニュー <span class="highlight-red">(非表示: display:none)</span> --&gt;
+&lt;div class="hidden-mobile-menu"&gt;
+    &lt;a href="#mobile"&gt;ニュース&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;!-- 2. メイン表示エリア <span class="highlight-green">(★本物・可視要素)</span> --&gt;
+&lt;div class="card"&gt;
+    &lt;a href="#news" id="news-main-btn" aria-label="ニュースへ遷移する"&gt;ニュース&lt;/a&gt;
+    &lt;button id="btn-do-search" data-action="search"&gt;検索&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- 3. フッター領域 <span class="highlight-red">(非表示: visibility:hidden)</span> --&gt;
+&lt;div class="hidden-footer-area"&gt;
+    &lt;a href="#footer"&gt;ニュース&lt;/a&gt;
+&lt;/div&gt;</pre>
+    </div>
+
+    <!-- 1. スマホ用非表示メニュー（非表示） -->
+    <div class="hidden-mobile-menu">
+        <a href="#mobile-news" id="mobile-news-link">ニュース</a>
+        <button id="mobile-search-btn">検索</button>
+    </div>
+
+    <!-- 2. メイン表示エリア（人間が目視で見えている可視要素） -->
+    <div class="card" style="margin-top:15px; background:#ffffff;">
+        <h3>■ メインコンテンツエリア（画面上の可視要素）</h3>
+        <p style="font-size:0.9rem; color:#334155;">以下のボタン・リンクを『ニュース』『検索』という文字列指定だけでクリックします。</p>
+        
+        <div style="display:flex; gap:15px; margin-top:15px;">
+            <a href="#news" id="news-main-btn" aria-label="ニュースへ遷移する" style="padding:10px 20px; background:#1e40af; color:#fff; text-decoration:none; border-radius:4px; font-weight:bold;">ニュース</a>
+            
+            <button id="btn-do-search" data-action="search" onclick="alert('検索が実行されました！')" style="padding:10px 20px; background:#16a34a; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">検索</button>
+        </div>
+
+        <div id="action-result" style="margin-top:15px; color:#1e3a8a; font-weight:bold;"></div>
+    </div>
+
+    <!-- 3. フッター隠しエリア（非表示） -->
+    <div class="hidden-footer-area">
+        <a href="#footer-news">ニュース</a>
+        <button>検索</button>
+    </div>
+
+    <script>
+        document.getElementById('news-main-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('action-result').innerText = '★ 「ニュース」ボタンが安全にクリックされました！';
+        });
+    </script>
+</body>
+</html>

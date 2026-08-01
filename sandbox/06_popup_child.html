@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- 
+        ==================================================================
+        【第2章-2】06_popup_child.html (子画面)
+        [RPAテスト目的] ポップアップタブ切替後の子画面操作 ＆ 画面クローズ
+        - タイトル検出用: Switch-TabByTitle
+        - 期待値: "[IP100801] 部門検索（子画面）"
+        ==================================================================
+    -->
+    <meta charset="UTF-8">
+    <title>[IP100801] 部門検索（子画面）</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+<body style="background:#fff; padding:15px;">
+    <h3>■ 部門検索ポップアップ</h3>
+    <p style="font-size:0.85rem; color:#666;">該当する部門を選択してください。</p>
+
+    <div class="card" style="margin-top:10px;">
+        <!-- 
+            ==================================================================
+            [RPAテスト目的①] 子画面内での検索・絞り込み操作
+            - VBA実行コマンド:
+              rpaEngine.RunAction "Set-WebXPathTextInput", CreateParams("XPath", "//input[@id='searchKeyword']", "Value", "財政")
+              rpaEngine.RunAction "Invoke-WebXPathClick", CreateParams("XPath", "//button[@id='btnSearch']")
+            ==================================================================
+        -->
+        <input type="text" id="searchKeyword" placeholder="部門名を入力 (例: 財政)" style="width:200px;">
+        <button type="button" id="btnSearch" onclick="filterTable()">検索</button>
+    </div>
+
+    <div class="card" style="margin-top:15px;">
+        <!-- 
+            ==================================================================
+            [RPAテスト目的②] 子画面データテーブルからの行選択
+            - VBA実行コマンド (2行目の財政課を選択する場合):
+              rpaEngine.RunAction "Invoke-WebXPathClick", CreateParams("XPath", "//button[@id='btnSelect_D02']")
+            - 動作: 選択ボタンを押すと、親画面の setDepartmentData() を呼んで値を渡し、この画面を閉じます (window.close)。
+            ==================================================================
+        -->
+        <table id="deptTable" border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+            <thead>
+                <tr style="background:#f1f5f9;">
+                    <th>選択</th>
+                    <th>部門コード</th>
+                    <th>部門名称</th>
+                </tr>
+            </thead>
+            <tbody id="deptTableBody">
+                <tr>
+                    <td><button id="btnSelect_D01" onclick="selectAndClose('D01', '総務課')">選択</button></td>
+                    <td>D01</td>
+                    <td>総務課</td>
+                </tr>
+                <tr>
+                    <td><button id="btnSelect_D02" onclick="selectAndClose('D02', '財政課')">選択</button></td>
+                    <td>D02</td>
+                    <td>財政課</td>
+                </tr>
+                <tr>
+                    <td><button id="btnSelect_D03" onclick="selectAndClose('D03', '市民課')">選択</button></td>
+                    <td>D03</td>
+                    <td>市民課</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+<script>
+        // 親画面へ値を渡して子画面を閉じる処理
+        function selectAndClose(code, name) {
+            // 経路1. 本番(HTTP)環境用: window.opener 経由での直接反映
+            try {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.setDepartmentData(code, name);
+                }
+            } catch (e) {
+                console.log("window.opener へのアクセス制限を検知");
+            }
+
+            // 経路2. ローカル(file://)環境用: localStorage を経由した確実な値の渡却
+            localStorage.setItem('selected_deptCode', code);
+            localStorage.setItem('selected_deptName', name);
+
+            // 自画面（ポップアップ）を閉じる
+            window.close();
+        }
+
+        // 簡易絞り込み
+        function filterTable() {
+            const kw = document.getElementById('searchKeyword').value;
+            const rows = document.querySelectorAll('#deptTableBody tr');
+            rows.forEach(tr => {
+                const text = tr.children[2].innerText;
+                tr.style.display = text.includes(kw) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

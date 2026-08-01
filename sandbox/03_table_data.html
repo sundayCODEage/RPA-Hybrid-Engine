@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <!-- 
+        ==================================================================
+        [RPAテスト目的] データテーブルのCSV抽出
+        - セレクタ指定: "#sampleTable"
+        - コマンド: Export-WebTableToCsv
+
+        ==================================================================
+        【制限事項・仕様メモ (iframe操作について)】
+        ・file:// (ローカルファイル) 環境では、Chromium の Same-Origin Policy
+          制限により、iframe 内のクロスドメインアクセスが "Origin: null" 
+          としてブラウザ通信層で一律ブロックされる仕様があります。
+        ・そのため、インフレーム操作 (Wait-WebElementInFrame / Invoke-WebClickInFrame)
+          の動作テストは、本ファイル内ではなく本番同様の https:// 公開テストサイト
+          (https://the-internet.herokuapp.com/iframe) にて検証を行います。
+        ・実際の業務システム (http:// / https://) では本制限は発生せず、
+          同一ドメイン内の iframe に対して問題なく動作します。
+        ==================================================================
+    -->
+    <title>03. データ抽出テスト画面</title>
+    <link rel="stylesheet" href="style_common.css">
+</head>
+<body>
+    <h2>■ 第1章-3：データテーブルのCSV抽出 ＆ iframe内操作テスト</h2>
+    <p>画面上のテーブルデータ（職員一覧）の一括取得を検証します。</p>
+
+    <!-- 1. 職員マスタ情報テーブル -->
+    <div class="card">
+        <h3>■ 職員マスタ情報一覧</h3>
+        <table id="sampleTable" border="1" style="width:100%; border-collapse:collapse; text-align:center; margin-top:10px; font-size:0.9rem;">
+            <thead>
+                <tr style="background:#f1f5f9;">
+                    <th style="padding:4px;">職員ID</th>
+                    <th style="padding:4px;">氏名</th>
+                    <th style="padding:4px;">所属部署</th>
+                    <th style="padding:4px;">ステータス</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:4px;">1001</td>
+                    <td style="padding:4px;">会社 太郎</td>
+                    <td style="padding:4px;">総務課</td>
+                    <td style="padding:4px;">有効</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px;">1002</td>
+                    <td style="padding:4px;">海外 花子</td>
+                    <td style="padding:4px;">財政課</td>
+                    <td style="padding:4px;">有効</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px;">1003</td>
+                    <td style="padding:4px;">試験 二郎</td>
+                    <td style="padding:4px;">市民課</td>
+                    <td style="padding:4px;">保留</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 2. ダミーインフレーム表示エリア -->
+    <div class="card" style="margin-top:20px;">
+        <h3>■ インフレーム（iframe）操作エリア (ダミー表示)</h3>
+        <iframe id="testFrame" name="testFrame" src="03_frame_child.html" style="width:100%; height:80px; border:2px dashed #cbd5e1; border-radius:4px; background:#ffffff;"></iframe>
+    </div>
+
+    <!-- 3. テスト仕様・注意書きエリア -->
+    <div class="card" style="margin-top:20px; background:#f8fafc; border-left:4px solid #0284c7;">
+        <h3 style="color:#0369a1; margin-top:0;">💡 インフレーム（iframe）操作のテスト仕様について</h3>
+        <p style="font-size:0.88rem; color:#334155; line-height:1.6; margin-bottom:4px;">
+            ※ <code>file://</code> （ローカル環境）ではChromiumのセキュリティ制限により、ローカルファイル間の <code>iframe</code> アクセスが遮断される仕様があります。<br>
+            そのため、<span style="color:#dc2626; font-weight:bold;">本ステップ直後に本番Web同様の https:// 環境（公開テストサイト）へ遷移して自動検証を行います。</span>
+        </p>
+        <p style="font-size:0.85rem; color:#d97706; font-weight:bold; margin-top:5px; margin-bottom:5px;">
+            ⏳ 要素取得のタイムアウト検証および通信待機が含まれるため、次の画面へ遷移するまでしばらく時間がかかります。
+        </p>
+        <p style="font-size:0.88rem; color:#64748b; margin-top:5px; margin-bottom:0;">
+            ※ PCのネットセキュリティや社内プロキシの設定により、Edgeで <code>https://the-internet.herokuapp.com</code> の読み込みエラーが表示される場合は、ネットワーク接続をご確認ください。
+        </p>
+        <br>
+    </div>
+</body>
+</html>
