@@ -84,7 +84,7 @@ VBAでのプロセス間通信（JSON解析）のため、[VBA-JSON (JsonConvert
 * `Microsoft.Web.WebView2.WinForms.dll` (UI表示用)
 * `WebView2Loader.dll` (PC内のEdgeランタイム本体と接続する重要ファイル。PowerShellから直接ロードはされません)<br>
 
-_同梱のツール 「WebView2 DLL 自動セットアップ_Rxx」 を実行することでも自動で3つのDLLがダウンロードされ、`Libs` フォルダへ格納されます。（ときどき最新バージョンの確認は必要です。）_
+_同梱のツール 「WebView2 DLL 自動セットアップ_xx」 を実行することでも自動で3つのDLLがダウンロードされ、`Libs` フォルダへ格納されます。（ときどき最新バージョンの確認は必要です。）_
 
 <details>
   <summary>💻 <i>( --- WebView2 DLL 自動セットアップ --- )</i></summary>
