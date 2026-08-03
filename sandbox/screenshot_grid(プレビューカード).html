@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Sandbox Preview Grid</title>
+    <style>
+        /* ===================================================================
+           【レイアウト設定ガイド】
+           画面の列数を変更したい場合は、下の .grid-container の数値を変更してください。
+
+           [2列表示にしたい場合]
+           grid-template-columns: repeat(2, 1fr);
+           width: 800px;
+
+           [3列表示にしたい場合]
+           grid-template-columns: repeat(3, 1fr);
+           width: 1200px;
+
+           [4列表示にしたい場合] (現在の標準設定)
+           grid-template-columns: repeat(4, 1fr);
+           width: 1600px;
+        =================================================================== */
+
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            background: #e2e8f0; 
+            font-family: 'BIZ UDGothic', sans-serif; 
+        }
+
+        /* --- 1. 全体のグリッドレイアウト（配置） --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* ◀ ここを列数に合わせて変更 */
+            gap: 20px;                             /* 画面同士の隙間 */
+            width: 1600px;                         /* ◀ ここを全体の幅に合わせて変更 */
+            margin: 0 auto;
+        }
+
+        /* --- 2. 各カードの外観 --- */
+        .card { 
+            background: #fff; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+            display: flex;
+            flex-direction: column;
+        }
+
+        h3 { 
+            margin: 0; 
+            padding: 10px; 
+            background: #0284c7; 
+            color: white; 
+            font-size: 15px; 
+            text-align: center; 
+            z-index: 10;
+        }
+
+        /* --- 3. 縮小トリック用の「窓枠（ラッパー）」 --- */
+        /* この枠で指定した高さ(250px)以上の部分は切り取られて見えなくなります */
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            height: 250px; 
+            overflow: hidden; /* 枠からはみ出た部分を隠す */
+            background: #fff;
+        }
+
+        /* --- 4. iframe本体の縮小ハック --- */
+        /* 【解説】iframeは直接サイズを指定するとレスポンシブ崩れが起きるため、
+           一度「元の画面サイズ(広め)」で描画させてから、CSSのtransformで縮小表示させます。*/
+        iframe { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            
+            /* 縮小しても枠内に隙間（余白）ができないよう、あらかじめ約1.6倍〜2倍の広さで描画しておきます */
+            width: 170%;  
+            height: 200%; 
+            border: none; 
+            
+            /* プレビュー用のため、間違えて中のボタン等を押さないようにクリックを無効化 */
+            pointer-events: none; 
+            
+            /* 4列配置で文字が読めるベストな縮小率（60%縮小） */
+            transform: scale(0.6); 
+            
+            /* 縮小する際の「基準点」を左上に固定（指定しないと中央に向かって縮小されて枠とズレてしまいます） */
+            transform-origin: top left; 
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="card">
+            <h3>01_basic_form</h3>
+            <div class="iframe-wrapper"><iframe src="01_basic_form.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>02_async_load</h3>
+            <div class="iframe-wrapper"><iframe src="02_async_load.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>03_table_data</h3>
+            <div class="iframe-wrapper"><iframe src="03_table_data.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>04_file_download</h3>
+            <div class="iframe-wrapper"><iframe src="04_file_download.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>05_business_batch</h3>
+            <div class="iframe-wrapper"><iframe src="05_business_batch.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>06_popup_parent</h3>
+            <div class="iframe-wrapper"><iframe src="06_popup_parent.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>07_pdf_embed</h3>
+            <div class="iframe-wrapper"><iframe src="07_pdf_embed.html"></iframe></div>
+        </div>
+        <div class="card">
+            <h3>08_robust_dom</h3>
+            <div class="iframe-wrapper"><iframe src="08_robust_dom.html"></iframe></div>
+        </div>
+    </div>
+</body>
+</html>
