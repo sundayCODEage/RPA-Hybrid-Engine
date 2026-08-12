@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>画面オーバーレイ（マスク）待機テスト</title>
+    <style>
+        body { font-family: "Meiryo", sans-serif; margin: 20px; line-height: 1.6; color: #333; }
+        .container { max-width: 650px; margin: 0 auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .explanation { background-color: #eaffea; padding: 15px; margin-bottom: 25px; border-left: 5px solid #107c10; border-radius: 3px; }
+        
+        button.action-btn { padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: #107c10; color: white; border: none; border-radius: 4px; }
+        button.action-btn:hover { background-color: #0b5a0b; }
+        #resultMsg { margin-top: 20px; font-weight: bold; font-size: 1.2em; color: #107c10; height: 30px; }
+
+        /* 
+          =====================================================================
+          【解説】オーバーレイマスクのスタイル設定
+          z-index: 9999 で画面の最前面に覆いかぶさり、半透明(rgba)の黒い膜を張ります。
+          =====================================================================
+        */
+        #mask {
+            display: none; /* 初期状態は非表示 */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999; 
+            text-align: center;
+        }
+        
+        /* マスク中の中央に表示されるローディングテキスト */
+        #mask-content {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body style="background-color: #f5f5f5;">
+    <div class="container">
+        <h2>画面オーバーレイ（マスク）自動待機テスト</h2>
+        <div class="explanation">
+            <p><strong>【テスト概要】</strong></p>
+            <p>実務のWebシステムで頻出する「重い処理の最中に画面全体が暗くなり、操作不能になる」状態を再現したサンドボックスです。</p>
+            <p>このテストでは、要素名を個別に指定することなく、RPAエンジン独自のコマンドである <code>Wait-WebScreenUnlock</code> を呼び出します。<br>
+            <b>エンジンが画面全体を覆うマスクを自動で検知し、ロックが完全に解除されるまで正確に待機できるか</b>をテストします。</p>
+        </div>
+
+        <button id="btnRun" class="action-btn" onclick="startLock()">重い処理を開始 (5秒間ロック)</button>
+        <div id="resultMsg"></div>
+
+    </div>
+
+    <!-- 画面を覆うマスク要素（処理開始時に表示されます） -->
+    <!-- ★実際の業務システムで頻出する複雑な属性（BlockUIなど）を再現 -->
+    <div id="mask" class="overlay mask loading blockUI" style="opacity: 0.99;">
+        <div id="mask-content">処理中... しばらくお待ちください</div>
+    </div>
+
+    <!-- 初期状態に文字を入れておく -->
+    <div id="resultMsg">【状態】未実行（ボタンを押してください）</div>
+
+    <script>
+        function startLock() {
+            // 1. 処理開始と同時にテキストを変える
+            document.getElementById('resultMsg').innerText = '処理中...（マスク表示中）';
+            
+            // 2. マスク要素を表示（画面がロックされる）
+            document.getElementById('mask').style.display = 'block';
+            
+            // 3. 重い処理をシミュレート（5秒後にマスクを解除）
+            setTimeout(function() {
+                // マスクを非表示 (display: none) に戻す
+                document.getElementById('mask').style.display = 'none';
+                
+                // 完了メッセージを表示
+                document.getElementById('resultMsg').innerText = '処理が完了しました！';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

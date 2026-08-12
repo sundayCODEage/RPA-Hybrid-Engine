@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Shadow DOM 操作テスト</title>
+    <style>
+        body { font-family: "Meiryo", sans-serif; margin: 20px; line-height: 1.6; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .explanation { background-color: #eef7ff; padding: 15px; margin-bottom: 25px; border-left: 5px solid #0078d4; border-radius: 3px; }
+    </style>
+</head>
+<body style="background-color: #f5f5f5;">
+    <div class="container">
+        <h2>Shadow DOM 操作テスト</h2>
+        
+        <!-- 【上段】 テスト概要 -->
+        <div class="explanation">
+            <p><strong>【テスト概要】</strong></p>
+            <p>RPAエンジンが <b>Shadow DOM</b> 内部の要素を正しく操作できるかを検証する。</p>
+            <p>通常のRPAツール（古いSeleniumやVBAのIE操作など）では、Shadow DOMのカプセル化（壁）に阻まれて内部のテキストボックスやボタンにアクセスできません。</p>
+        </div>
+
+        <!-- 
+          =====================================================================
+          【中央】 ここにShadow DOMの「ホスト（入り口となる親要素）」を配置します
+          =====================================================================
+        -->
+        <div id="host" style="margin-bottom: 25px;"></div>
+
+        <!-- 【下段】 技術解説 -->
+        <div class="explanation" style="margin-bottom: 0;">
+            <p><strong>💡 【技術解説】 Shadow DOM の2つの実装パターン</strong></p>
+            <ul style="margin-top: 5px;">
+                <li><strong>パターンA： スロット（差し込み）型</strong> <i>(例: Part 11 / herokuapp)</i><br>
+                Shadow DOMの中に「穴（&lt;slot&gt;）」だけを用意して、外側のHTMLから文字やリストを差し込む作り方です。外側に <code>slot="my-text"</code> などの目印が存在するため、比較的容易に捕捉できます。</li>
+                <li style="margin-top: 8px;"><strong>パターンB： 完全カプセル（隠蔽）型</strong> <i>(★本画面のテスト対象)</i><br>
+                入力欄やボタンなどのUI部品を、最初からShadow DOMの壁の内側にJavaScriptで直接作り込んでしまう設計です。外側からの差し込み口（slot）が一切ないため、エンジン自らが壁を貫通して内部を直接探索するロジックが必要になります。</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. ホスト要素を取得
+        const host = document.getElementById('host');
+
+        // 2. ホストに対してShadow DOMをアタッチ (openモードによりアクセスを許可)
+        const shadow = host.attachShadow({ mode: 'open' });
+
+        // 3. Shadow DOM内部のHTML構造（UI部品）を定義して流し込む
+        shadow.innerHTML = `
+            <style>
+                /* Shadow DOM内部専用のスタイル。外のページには影響を与えません */
+                .shadow-box { padding: 20px; border: 2px dashed #0078d4; background-color: #fff; border-radius: 5px; }
+                input { padding: 8px; margin-right: 10px; width: 200px; border: 1px solid #ccc; }
+                button { padding: 8px 20px; cursor: pointer; background-color: #0078d4; color: white; border: none; border-radius: 3px; }
+                button:hover { background-color: #005a9e; }
+                #result { margin-top: 15px; font-weight: bold; color: #d13438; font-size: 1.1em; }
+            </style>
+            <div class="shadow-box">
+                <p style="margin-top:0; color:#555;">▼ 以下の要素は Shadow DOM 内部に存在します</p>
+                <input type="text" id="shadow-input" placeholder="テストテキストを入力...">
+                <button id="shadow-btn">送信</button>
+                <div id="result"></div>
+            </div>
+        `;
+
+        // 4. Shadow DOM内部のボタンに対するイベント（動作）を設定
+        shadow.getElementById('shadow-btn').onclick = function() {
+            const inputValue = shadow.getElementById('shadow-input').value;
+            shadow.getElementById('result').innerText = '入力値は: ' + inputValue;
+        };
+    </script>
+</body>
+</html>
