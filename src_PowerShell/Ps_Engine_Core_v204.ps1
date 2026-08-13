@@ -254,9 +254,9 @@ Write-DebugLog -Message "[System] 情報: 通信モードスイッチ ($global:C
 
 # 常時ロード対象モジュールの定義
 $alwaysLoadLibs = @(
-    "Lib-WebAction_v204.ps1",
+    "Lib-WebAction_v205.ps1",
     "Lib-WebXPath_v101.ps1",
-    "Lib-DesktopUIA_v103.ps1",
+    "Lib-DesktopUIA_v104.ps1",
     "Lib-WebDebug_v101.ps1",
     "Lib-WebSafeAction_v101.ps1",
     "Lib-WebView2_Init_v101.ps1",
