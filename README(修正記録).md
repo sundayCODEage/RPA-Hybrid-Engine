@@ -63,9 +63,51 @@ $alwaysLoadLibs = @(
 ・ 11_overlay_mask　／ 画面オーバーレイ（マスク）待機テスト<br>
 
 #### 3　sample_BOX/　について
-* （公開サイト用テストコード）<br>
-・ Mod_TestRun1_Base一般的な.bas　／ 実行: Test_Run1_Base<br>
-・ Mod_TestRun2_Base少し高度.bas　／ 実行: Test_Run2_Base<br>
+ （公開サイトでのテストコード）<br>
+
+* Mod_TestRun1_Base一般的な.bas　／ 実行: Test_Run1_Base<br>
+
+<details>
+  <summary><i>　　 (補足) Part 7: iframeの操作確認コード</i></summary>
+
+```vba
+    ' 通常の操作では届かないiframe内の要素に対して直接アタック
+'xx    rpaEngine.RunAction "Wait-WebElementInFrame", CreateParams("FrameSelector", "#mce_0_ifr", "ElementSelector", "body#tinymce")
+'xx    rpaEngine.RunAction "Invoke-WebClickInFrame", CreateParams("FrameSelector", "#mce_0_ifr", "ElementSelector", "body#tinymce")
+
+    ' ==========================================================================
+    ' 1. iframe内の要素(エディタの入力領域)が出現するのを待機
+    rpaEngine.RunAction "Wait-WebElementInFrame", CreateParams("FrameSelector", "#mce_0_ifr", "ElementSelector", "body#tinymce")
+    
+    ' 2. 変更前のテキストを取得
+    result = rpaEngine.RunAction("Get-WebText", CreateParams("Selector", "body#tinymce"))
+    Debug.Print " ◆ [変更前] iframe内のテキスト: " & result
+    
+    ' 3. iframe内の要素を直接クリック
+    ' （エラーなく通過できれば、要素を捕捉してクリック命令が届いている）
+    rpaEngine.RunAction "Invoke-WebClickInFrame", CreateParams("FrameSelector", "#mce_0_ifr", "ElementSelector", "body#tinymce")
+    
+    ' 4. iframe内の背景色とテキストを直接書き換える
+    ' （TinyMCEの仕様によるSendKeysの空振りを回避し、視覚的な確認）
+    Debug.Print " >> iframe内の背景色とテキストを直接書き換えます..."
+    
+    jsCode = "var doc = document.querySelector('#mce_0_ifr').contentDocument;" & _
+             "var body = doc.querySelector('body#tinymce');" & _
+             "body.style.backgroundColor = 'yellow';" & _
+             "body.innerHTML = '<p>RPA iframe TEST OK!</p>';"
+    rpaEngine.RunAction "Invoke-WebScript", CreateParams("Js", jsCode)
+    
+    ' 画面の変化を目視できるように1秒待機
+    Sleep 1000
+    
+    ' 5. 変更後のテキストを取得して、本当に書き換わったか確認する
+    result = rpaEngine.RunAction("Get-WebText", CreateParams("Selector", "body#tinymce"))
+    Debug.Print " ◆ [変更後] iframe内のテキスト: " & result
+    ' ==========================================================================
+```
+</details>
+
+* Mod_TestRun2_Base少し高度.bas　／ 実行: Test_Run2_Base<br>
 
 ```text
 ├📊 sample_rpa_test.xlsm    # VBA ( テストシナリオ )
