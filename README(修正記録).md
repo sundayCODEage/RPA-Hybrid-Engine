@@ -1,3 +1,25 @@
+_修正記録（2回目）　2026/08/28_
+
+セキュリティ環境下（F12開発者ツールが使えない）職場でも、RPA要素を簡単に取得できるツール（Lib-DevTools : OSレベルのUIAとブラウザのDOM/CDPをシームレスに結合）をテストする中で、
+一部モジュールの更新が必要になったので、とりあえずアップしときます。<br>
+
+Lib-WebCDP_v102 / Lib-WebDebug_v102 を　追加しています。
+
+Ps_Engine_Core_v204　の修正
+```powershell
+95行目あたり（Add-Type -AssemblyName System.Windows.Forms ）
+
+#✘ Add-Type -AssemblyName System.Windows.Forms
+# .NETのUIアセンブリを最優先でロードし、DPI(画面拡大率)の基準を強制統一する
+Add-Type -AssemblyName System.Windows.Forms, WindowsBase, UIAutomationClient, UIAutomationTypes
+
+try {
+    # 画面サイズを取得する前にWPFのシステムを目覚めさせ、DPIを真の物理サイズに固定する
+    $dummyPoint = New-Object System.Windows.Point(0,0)
+    [System.Windows.Automation.AutomationElement]::FromPoint($dummyPoint) | Out-Null
+} catch {}
+```
+
 _修正記録（1回目）　2026/08/13_
 
 2026/08/02にコード掲載しました。その後、開発テストに使っていた公開サイトでのテスト用コードを再整理する中で、一部バグに気づきました。<br>
