@@ -4,7 +4,7 @@ _修正記録（2回目）　2026/08/28 _ 2026/08/30
 一部モジュールの更新が必要になったので、とりあえずアップしときます。<br>
 
 Lib-DesktopUIA_v105 / Lib-WebAction_v206 / Lib-WebXPath_v102 /<br>
-Lib-WebCDP_v102 / Lib-WebDebug_v102 / Lib-DevTools_v101 を　追加しています。<br>
+Lib-WebCDP_v102 / Lib-WebDebug_v102 / Lib-DevTools_v101 を 追加しています。<br>
 Ps_Engine_Core_v205　を追加（Lib-DevTools_v101のテスト）<br>
 
 **Lib-DevTools_v101** 難航中、<br>
