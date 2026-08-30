@@ -1,10 +1,15 @@
-_修正記録（2回目）　2026/08/28_
+_修正記録（2回目）　2026/08/28 _ 2026/08/30
 
 セキュリティ環境下（F12開発者ツールが使えない）職場でも、RPA要素を簡単に取得できるツール（Lib-DevTools : OSレベルのUIAとブラウザのDOM/CDPをシームレスに結合）をテストする中で、
 一部モジュールの更新が必要になったので、とりあえずアップしときます。<br>
 
-Lib-WebCDP_v102(もう少し修正が必要、業務システムのポップアップ)/ Lib-WebDebug_v102 を　追加しています。
+Lib-DesktopUIA_v105 / Lib-WebAction_v206 / Lib-WebXPath_v102 /<br>
+Lib-WebCDP_v102 / Lib-WebDebug_v102 / Lib-DevTools_v101 を　追加しています。<br>
+Ps_Engine_Core_v205　を追加（Lib-DevTools_v101のテスト）<br>
 
+**Lib-DevTools_v101** 難航中、<br>
+**sample_DevTools_test(まだまだ)** まだ安定してピッカー出来ません。誰か、高性能AIさんに改造して貰って欲しいが誰も興味ないか。<br>
+ 
 Ps_Engine_Core_v204　の修正
 ```powershell
 95行目あたり（Add-Type -AssemblyName System.Windows.Forms ）
