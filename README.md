@@ -1,6 +1,7 @@
 ## 汎用RPA操作エンジン (VBA × PowerShell × WebView2)
 
-**2026/10/01** リポジトリ を移動しました。
+**2026/10/01** リポジトリ を移動しました。<br>
+sundayCODEage/vba-ps-webview2-engine-element-viewer<br>
 
 ~~sample_BOX を追加しました。 *（公開サイトでのテストコードを追加しました。2026/08/13　内容は、修正記録で）*~~
 
